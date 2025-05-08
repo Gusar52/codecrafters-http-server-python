@@ -11,9 +11,29 @@ def main():
 
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
 
-    server_socket.accept()[0].sendall("HTTP/1.1 200 OK\r\n\r\n".encode())
+    client_socket, addr = server_socket.accept()
 
-    server_socket.accept()  # wait for client
+    with client_socket:
+
+        data = client_socket.recv(1024)
+
+        request = data.decode()
+
+        print(request)
+
+        # Parse the HTTP request
+
+        if request.startswith("GET / HTTP/1.1"):
+
+            response = "HTTP/1.1 200 OK\r\n\r\n"
+
+        else:
+
+            response = "HTTP/1.1 404 Not Found\r\n\r\n"
+
+        client_socket.sendall(response.encode())
+
+        # client_socket.sendall(data)
 
 
 if __name__ == "__main__":
